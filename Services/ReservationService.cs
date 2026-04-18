@@ -37,9 +37,21 @@ public class ReservationService : IReservationService
     return ReservationMapper.ToResponse(createdReservation);
   }
 
+
   private static bool HasOverlap(TimeOnly startTime, TimeOnly endTime, List<Reservation> existingReservations)
   {
     return existingReservations.Any(r =>
         startTime < r.EndTime && endTime > r.StartTime);
+  }
+  public async Task<bool> DeleteAsync(Guid id)
+  {
+    var existingReservation = await _reservationRepository.GetByIdAsync(id);
+    if (existingReservation == null)
+    {
+      return false;
+    }
+
+    await _reservationRepository.DeleteAsync(existingReservation);
+    return true;
   }
 }
